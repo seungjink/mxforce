@@ -1051,6 +1051,15 @@ double **Density_Grid;
 double **Density_Grid_B;
 
 /*******************************************************
+ double **Density_Grid_B_Atom; 
+  Atom resolved electron densities on grids in the partition B
+  size: Density_Grid[2 or 4][My_NumGridB_AB][atomnum+1]
+  allocation: allocate in truncation.c
+  free:       call as Free_Arrays(0) in openmx.c
+*******************************************************/
+double ***Density_Grid_B_Atom;
+
+/*******************************************************
  double **Density_Grid_D; 
   electron densities on grids in the partition D
   size: Density_Grid[2 or 4][My_NumGridD]
