@@ -1,0 +1,23 @@
+GridN_Atom	-> [atomnum+1]
+	the number of grids overlaping to each atom
+
+GcAN 
+
+
+M2G	M2G[Matomnum+1]
+	M2G gives a conversion from the medium
+	index to the global indicies of atoms.
+
+Matomnum
+	Total number of atom in medium
+
+ int **natn;
+	grobal index number of neighboring atoms of an atom ct_AN
+	size: natn[atomnum+1][Max_FSNAN*ScaleSize+1]
+	allocation: call as Allocate_Arrays(3) in truncation.c
+
+ncn = neighboring cell 
+
+int *FNAN;
+	the number of first neighboring atoms
+	 size: FNAN[atomnum+1]
