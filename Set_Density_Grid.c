@@ -706,6 +706,16 @@ double Set_Density_Grid(int Cnt_kind, int Calc_CntOrbital_ON, double *****CDM, d
       Density_Grid_B0[spin][BN] = 0.0;
     }
   }
+
+  /* Atom resolved B grid - sjkang */
+  for (i=0; i<=atomnum; i++){
+    for (spin=0; spin<(SpinP_switch+1); spin++){
+      for (BN=0; BN<My_NumGridB_AB; BN++){
+        Density_Grid_B_Atom[i][spin][BN] = 0.0;
+      }
+    }
+  }
+  /* - sjkang */
   
   /* superposition of densities rho_i */
 
@@ -729,8 +739,8 @@ double Set_Density_Grid(int Cnt_kind, int Calc_CntOrbital_ON, double *****CDM, d
 	  Density_Grid_B0[0][BN] += Den_Rcv_Grid_A2B[ID][LN*2  ];
 	  Density_Grid_B0[1][BN] += Den_Rcv_Grid_A2B[ID][LN*2+1];
 
-    Density_Grid_B_Atom[0][BN][Gc_AN] += Den_Rcv_Grid_A2B[ID][LN*2  ];
-    Density_Grid_B_Atom[1][BN][Gc_AN] += Den_Rcv_Grid_A2B[ID][LN*2+1];
+    Density_Grid_B_Atom[Gc_AN][0][BN] += Den_Rcv_Grid_A2B[ID][LN*2  ];
+    Density_Grid_B_Atom[Gc_AN][1][BN] += Den_Rcv_Grid_A2B[ID][LN*2+1];
 
 	} 
 
@@ -747,17 +757,19 @@ double Set_Density_Grid(int Cnt_kind, int Calc_CntOrbital_ON, double *****CDM, d
     } /* AN */ 
   } /* ID */  
 
-//  for (spin=0; spin<(SpinP_switch+1); spin++){
-//    printf("Spin %d:\n", spin);
-//    for (BN=0; BN<My_NumGridB_AB; BN++){
-//      printf("%-15s %.8f\n", "density BN0 :", Density_Grid_B0[spin][BN]);
-//      printf("%-15s %.8f\n", "density At 0:",    Density_Grid_B_Atom[spin][BN][1]);
-//      printf("%-15s %.8f\n", "density At 1:",    Density_Grid_B_Atom[spin][BN][2]);
-//      printf("%-15s %.8f\n", "density At 2:",    Density_Grid_B_Atom[spin][BN][3]);
-//      printf("%-15s %.8f\n\n", "density At 3:",  Density_Grid_B_Atom[spin][BN][4]);
-//    }
-//    printf("\n\n\n");
-//  }
+	if ( SpinP_switch==1 ){
+    for (spin=0; spin<(SpinP_switch+1); spin++){
+      printf("Spin %d:\n", spin);
+      for (BN=0; BN<My_NumGridB_AB; BN++){
+        printf("%-15s %.8f\n", "density BN0 :", Density_Grid_B0[spin][BN]);
+        printf("%-15s %.8f\n", "density At 0:",    Density_Grid_B_Atom[1][spin][BN]);
+        printf("%-15s %.8f\n", "density At 1:",    Density_Grid_B_Atom[2][spin][BN]);
+        printf("%-15s %.8f\n", "density At 2:",    Density_Grid_B_Atom[3][spin][BN]);
+        printf("%-15s %.8f\n\n", "density At 3:",  Density_Grid_B_Atom[4][spin][BN]);
+      }
+      printf("\n\n\n");
+    }
+  }
 
   /****************************************************
    Conjugate complex of Density_Grid[3][MN] due to

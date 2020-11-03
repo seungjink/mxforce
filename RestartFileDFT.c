@@ -870,6 +870,7 @@ void Output_Charge_Density(int MD_iter)
   int i,spin,BN;
   int numprocs,myid;
   double *TmpRho;
+  double **TmpRhoAtom;
   FILE *fp;
   char file_check[YOUSO10];
   char fileCD0[YOUSO10];
@@ -882,6 +883,11 @@ void Output_Charge_Density(int MD_iter)
 
   /* allocation of array */
   TmpRho = (double*)malloc(sizeof(double)*My_NumGridB_AB); 
+
+  TmpRhoAtom = (double**)malloc(sizeof(double)*(atomnum+1)); 
+  for(i=0; i<=atomnum; i++){
+    TmpRhoAtom[i] = (double*)malloc(sizeof(double)*My_NumGridB_AB);
+  }
 
   /* save numprocs, Ngrid1, Ngrid2, and Ngrid3 */
 
@@ -920,9 +926,18 @@ void Output_Charge_Density(int MD_iter)
       }
     } 
 
+    if (spin<=1){
+      for (i=1; i<=atomnum; i++){
+        for (BN=0; BN<My_NumGridB_AB; BN++){
+          TmpRhoAtom[i][BN] = Density_Grid_B[spin][BN] - ADensity_Grid_B[BN];
+        }
+      }
+    }
+
     /* shift the index of stored data */
 
     for (i=(Extrapolated_Charge_History-2); 0<=i; i--){
+      printf("Extrapolated Charge History: %i", Extrapolated_Charge_History);
  
       sprintf(fileCD1,"%s%s_rst/%s.crst%i_%i_%i",filepath,filename,filename,spin,myid,i);
       sprintf(fileCD2,"%s%s_rst/%s.crst%i_%i_%i",filepath,filename,filename,spin,myid,i+1);

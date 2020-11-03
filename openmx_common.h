@@ -1053,11 +1053,20 @@ double **Density_Grid_B;
 /*******************************************************
  double **Density_Grid_B_Atom; 
   Atom resolved electron densities on grids in the partition B
-  size: Density_Grid[2 or 4][My_NumGridB_AB][atomnum+1]
+  size: Density_Grid[atomnum+1][2 or 4][My_NumGridB_AB]
   allocation: allocate in truncation.c
   free:       call as Free_Arrays(0) in openmx.c
 *******************************************************/
 double ***Density_Grid_B_Atom;
+
+/*******************************************************
+ double **Restart_Spin_Angles;
+  spin angle for c2n calculation. 
+  size: atom_Fixed_XYZ[atomnum+1][2];
+  allocation: call as Allocate_Arrays(1) in Input_std.c
+  free:       call as Free_Arrays(0) in openmx.c
+*******************************************************/
+double **Restart_Spin_Angles;
 
 /*******************************************************
  double **Density_Grid_D; 

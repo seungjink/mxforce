@@ -155,6 +155,14 @@ void Allocate_Arrays(int wherefrom)
         atom_Fixed_XYZ[i][3] = 0;
       }
 
+      Restart_Spin_Angles = (double**)malloc(sizeof(double)*(atomnum+1));
+      for(i=0; i<=atomnum; i++){
+        Restart_Spin_Angles[i] = (double*)malloc(sizeof(double)*2);
+        /* default='theta=0, phi=0' */
+        Restart_Spin_Angles[i][0] = 0.0;
+        Restart_Spin_Angles[i][1] = 0.0;
+      }
+
       Cell_Gxyz = (double**)malloc(sizeof(double*)*(atomnum+4));
       for (i=0; i<(atomnum+4); i++){
         Cell_Gxyz[i] = (double*)malloc(sizeof(double)*4);

@@ -147,6 +147,18 @@ void array0()
       }
       free(Density_Grid_B);
     }
+    
+    /* Atom resolved B grid - sjkang */
+    if (SpinP_switch != 3){
+      for (i=0; i<=atomnum; i++){
+        for (j=0; j<=1; j++){
+          free(Density_Grid_B_Atom[i][j]);
+        }
+        free(Density_Grid_B_Atom[i]);
+      }
+      free(Density_Grid_B_Atom);
+    }
+    /* - sjkang */
 
     free(ADensity_Grid_B);
     free(PCCDensity_Grid_B[1]); free(PCCDensity_Grid_B[0]);
@@ -2674,6 +2686,11 @@ void array0()
     free(atom_Fixed_XYZ[i]);
   }
   free(atom_Fixed_XYZ);
+
+  for(i=0; i<=atomnum; i++){
+    free(Restart_Spin_Angles[i]);
+  }
+  free(Restart_Spin_Angles);
 
   for (i=0; i<(atomnum+4); i++){
     free(Cell_Gxyz[i]);

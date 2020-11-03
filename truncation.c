@@ -3044,15 +3044,16 @@ double truncation(int MD_iter,int UCell_flag)
       }
     }
 
+
     /* Atom resolved B grid - sjkang */
     if (SpinP_switch==1){
-      Density_Grid_B_Atom = (double***)malloc(sizeof(double*)*2); 
-      for (k=0; k<=1; k++){
-        Density_Grid_B_Atom[k] = (double**)malloc(sizeof(double)*My_NumGridB_AB); 
-        for (i=0; i<My_NumGridB_AB; i++){
-          Density_Grid_B_Atom[k][i] = (double*)malloc(sizeof(double)*(atomnum+1));  
-          for (j=0; j<=atomnum; j++){
-            Density_Grid_B_Atom[k][i][j] = 0.0;
+      Density_Grid_B_Atom = (double***)malloc(sizeof(double*)*(atomnum+1)); 
+      for (i=0; i<=atomnum; i++){
+        Density_Grid_B_Atom[i] = (double**)malloc(sizeof(double)*2); 
+        for (j=0; j<2; j++){
+          Density_Grid_B_Atom[i][j] = (double*)malloc(sizeof(double)*My_NumGridB_AB); 
+          for (k=0; k<My_NumGridB_AB; k++){
+            Density_Grid_B_Atom[i][j][k] = 0.0;
           }
         }
       }
