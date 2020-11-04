@@ -21,3 +21,8 @@ ncn = neighboring cell
 int *FNAN;
 	the number of first neighboring atoms
 	 size: FNAN[atomnum+1]
+
+Density_Grid_B_Atom[i][j][k]
+    i = atomnum, 1~atomnum
+    j = spin idx, 0,1
+    k = grid

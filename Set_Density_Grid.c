@@ -711,7 +711,7 @@ double Set_Density_Grid(int Cnt_kind, int Calc_CntOrbital_ON, double *****CDM, d
   for (i=0; i<=atomnum; i++){
     for (spin=0; spin<(SpinP_switch+1); spin++){
       for (BN=0; BN<My_NumGridB_AB; BN++){
-        Density_Grid_B_Atom[i][spin][BN] = 0.0;
+        Density_Grid_B0[spin][BN] = 0.0;
       }
     }
   }

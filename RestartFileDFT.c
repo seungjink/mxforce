@@ -867,15 +867,19 @@ void Output_HKS(int MD_iter, double *Uele, double *****CH )
 
 void Output_Charge_Density(int MD_iter)
 {
-  int i,spin,BN;
+  int i,j,spin,BN;
   int numprocs,myid;
   double *TmpRho;
   double **TmpRhoAtom;
   FILE *fp;
+  FILE *fp_atom;
   char file_check[YOUSO10];
   char fileCD0[YOUSO10];
   char fileCD1[YOUSO10];
   char fileCD2[YOUSO10];
+  char fileCD0_ATOM[YOUSO10];
+  char fileCD1_ATOM[YOUSO10];
+  char fileCD2_ATOM[YOUSO10];
 
   /* MPI */
   MPI_Comm_size(mpi_comm_level1,&numprocs);
@@ -929,7 +933,7 @@ void Output_Charge_Density(int MD_iter)
     if (spin<=1){
       for (i=1; i<=atomnum; i++){
         for (BN=0; BN<My_NumGridB_AB; BN++){
-          TmpRhoAtom[i][BN] = Density_Grid_B[spin][BN] - ADensity_Grid_B[BN];
+          TmpRhoAtom[i][BN] = Density_Grid_B_Atom[i][spin][BN]; // - ADensity_Grid_B[BN];
         }
       }
     }
@@ -946,6 +950,17 @@ void Output_Charge_Density(int MD_iter)
 	fclose(fp);
 	rename(fileCD1,fileCD2); 
       }
+
+      /* Atom resolved B grid - sjkang */
+      for(j=1; j<=atomnum; j++){
+        sprintf(fileCD1_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,filename,filename,j, spin,myid,i);
+        sprintf(fileCD2_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,filename,filename,j, spin,myid,i+1);
+        if ((fp_atom = fopen(fileCD1_ATOM,"rb")) != NULL){
+        	fclose(fp_atom);
+        	rename(fileCD1_ATOM,fileCD2_ATOM); 
+        }
+      }
+      /* - sjkang*/
     } 
 
     /* save current data */
@@ -960,7 +975,16 @@ void Output_Charge_Density(int MD_iter)
     else{
       printf("Could not open a file %s\n",fileCD0);
     }
-
+    for(i=1; i<=atomnum; i++){
+      sprintf(fileCD0_ATOM,"%s%s_rst/%s.crst%i_%i_%i_0",filepath,filename,filename,i,spin,myid);
+      if ((fp = fopen(fileCD0_ATOM,"wb")) != NULL){
+        fwrite(TmpRhoAtom[i],sizeof(double),My_NumGridB_AB,fp);
+        fclose(fp);
+      }
+      else{
+        printf("Could not open a file %s\n",fileCD0_ATOM);
+      }
+    }
   } /* spin */
 
   /****************************************************
@@ -980,6 +1004,11 @@ void Output_Charge_Density(int MD_iter)
 	
   /* freeing of array */
   free(TmpRho);
+
+  for(i=0; i<=atomnum; i++){
+    free(TmpRhoAtom[i]);
+  }
+  free(TmpRhoAtom);
 }
 
 
@@ -1007,8 +1036,10 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
   int numprocs,myid;
   FILE *fp;
   char fileCD[YOUSO10];
+  char fileCD0_ATOM[YOUSO10];
   char file_check[YOUSO10];
   double *tmp_array;
+  double **tmp_array_atom;
   int i_vec[10];
 
   /* MPI */
@@ -1032,6 +1063,11 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
     /* allocation of array */
 
     tmp_array = (double*)malloc(sizeof(double)*My_NumGridB_AB);
+
+    tmp_array_atom = (double**)malloc(sizeof(double)*(atomnum+1)); 
+    for(i=0; i<=atomnum; i++){
+      tmp_array_atom[i] = (double*)malloc(sizeof(double)*My_NumGridB_AB);
+    }
 
     /* read data and extrapolate data of crst files */
 
@@ -1070,6 +1106,28 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 	else{
 	  /* printf("Could not open a file %s\n",fileCD); */
 	}
+      for(j=1; j<=atomnum; j++){
+        sprintf(fileCD0_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,restart_filename,restart_filename,j,spin,myid,i);
+        if ((fp = fopen(fileCD0_ATOM,"rb")) != NULL){
+          fread(tmp_array_atom[j],sizeof(double),My_NumGridB_AB,fp);
+          fclose(fp);
+      	  if (i==0){
+      	    if (spin<=1){
+      	      for (BN=0; BN<My_NumGridB_AB; BN++){
+      		    Density_Grid_B_Atom[j][spin][BN] = extpln_coes[i]*tmp_array_atom[j][BN];
+      	      }
+      	    }
+      	  }
+      	  else{
+      	    for (BN=0; BN<My_NumGridB_AB; BN++){
+      		    Density_Grid_B_Atom[j][spin][BN] += extpln_coes[i]*tmp_array_atom[j][BN];
+      	    }
+      	  }
+        }
+        else{
+          /* printf("Could not open a file %s\n",fileCD0_ATOM); */
+        }
+      }
       }
     }
 
