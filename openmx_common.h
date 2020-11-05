@@ -1057,7 +1057,7 @@ double **Density_Grid_B;
   allocation: allocate in truncation.c
   free:       call as Free_Arrays(0) in openmx.c
 *******************************************************/
-double ***Density_Grid_B_Atom;
+double ***Density_Grid_B_Atom; 
 
 /*******************************************************
  double **Restart_Spin_Angles;
@@ -2580,6 +2580,8 @@ double PAO_Nkmax,Grid_Ecut,Finite_Elements_Ecut,rcut_FEB;
 double orbitalOpt_criterion,MD_Opt_criterion,orbitalOpt_SD_step;
 double MD_EvsLattice_Step;
 double Restart_Spin_Angle_Theta,Restart_Spin_Angle_Phi;
+int Restart_Read_Atom_Charge;  /* MAE local spin rotation - sjkang */
+int Restart_Write_Atom_Charge; /* MAE local spin rotation - sjkang */
 int MD_EvsLattice_flag[3];
 int MD_OutABC;
 double X_Center_Coordinate,Y_Center_Coordinate,Z_Center_Coordinate;

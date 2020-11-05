@@ -870,16 +870,16 @@ void Output_Charge_Density(int MD_iter)
   int i,j,spin,BN;
   int numprocs,myid;
   double *TmpRho;
-  double **TmpRhoAtom;
+  double **TmpRhoAtom; /* MAE local spin rotation - sjkang */
   FILE *fp;
-  FILE *fp_atom;
+  FILE *fp_atom; /* MAE local spin rotation - sjkang */
   char file_check[YOUSO10];
   char fileCD0[YOUSO10];
   char fileCD1[YOUSO10];
   char fileCD2[YOUSO10];
-  char fileCD0_ATOM[YOUSO10];
-  char fileCD1_ATOM[YOUSO10];
-  char fileCD2_ATOM[YOUSO10];
+  char fileCD0_ATOM[YOUSO10]; /* MAE local spin rotation - sjkang */
+  char fileCD1_ATOM[YOUSO10]; /* MAE local spin rotation - sjkang */
+  char fileCD2_ATOM[YOUSO10]; /* MAE local spin rotation - sjkang */
 
   /* MPI */
   MPI_Comm_size(mpi_comm_level1,&numprocs);
@@ -888,10 +888,14 @@ void Output_Charge_Density(int MD_iter)
   /* allocation of array */
   TmpRho = (double*)malloc(sizeof(double)*My_NumGridB_AB); 
 
-  TmpRhoAtom = (double**)malloc(sizeof(double)*(atomnum+1)); 
-  for(i=0; i<=atomnum; i++){
-    TmpRhoAtom[i] = (double*)malloc(sizeof(double)*My_NumGridB_AB);
+  /* >> MAE local spin rotation - sjkang */
+  if (Restart_Write_Atom_Charge ==1){
+    TmpRhoAtom = (double**)malloc(sizeof(double)*(atomnum+1)); 
+    for(i=0; i<=atomnum; i++){
+      TmpRhoAtom[i] = (double*)malloc(sizeof(double)*My_NumGridB_AB);
+    }
   }
+  /* << MAE local spin rotation - sjkang */
 
   /* save numprocs, Ngrid1, Ngrid2, and Ngrid3 */
 
@@ -930,19 +934,21 @@ void Output_Charge_Density(int MD_iter)
       }
     } 
 
-    if (spin<=1){
-      for (i=1; i<=atomnum; i++){
-        for (BN=0; BN<My_NumGridB_AB; BN++){
-          TmpRhoAtom[i][BN] = Density_Grid_B_Atom[i][spin][BN]; // - ADensity_Grid_B[BN];
+    /* >> MAE local spin rotation - sjkang */
+    if (Restart_Write_Atom_Charge ==1){
+      if (spin<=1){
+        for (i=1; i<=atomnum; i++){
+          for (BN=0; BN<My_NumGridB_AB; BN++){
+            TmpRhoAtom[i][BN] = Density_Grid_B_Atom[i][spin][BN]; // - ADensity_Grid_B[BN];
+          }
         }
       }
     }
+    /* << MAE local spin rotation - sjkang */
 
     /* shift the index of stored data */
 
     for (i=(Extrapolated_Charge_History-2); 0<=i; i--){
-      printf("Extrapolated Charge History: %i", Extrapolated_Charge_History);
- 
       sprintf(fileCD1,"%s%s_rst/%s.crst%i_%i_%i",filepath,filename,filename,spin,myid,i);
       sprintf(fileCD2,"%s%s_rst/%s.crst%i_%i_%i",filepath,filename,filename,spin,myid,i+1);
 
@@ -951,16 +957,18 @@ void Output_Charge_Density(int MD_iter)
 	rename(fileCD1,fileCD2); 
       }
 
-      /* Atom resolved B grid - sjkang */
-      for(j=1; j<=atomnum; j++){
-        sprintf(fileCD1_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,filename,filename,j, spin,myid,i);
-        sprintf(fileCD2_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,filename,filename,j, spin,myid,i+1);
-        if ((fp_atom = fopen(fileCD1_ATOM,"rb")) != NULL){
-        	fclose(fp_atom);
-        	rename(fileCD1_ATOM,fileCD2_ATOM); 
+      /* >> MAE local spin rotation - sjkang */
+      if (Restart_Write_Atom_Charge ==1){
+        for(j=1; j<=atomnum; j++){
+          sprintf(fileCD1_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,filename,filename,j, spin,myid,i);
+          sprintf(fileCD2_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,filename,filename,j, spin,myid,i+1);
+          if ((fp_atom = fopen(fileCD1_ATOM,"rb")) != NULL){
+          	fclose(fp_atom);
+          	rename(fileCD1_ATOM,fileCD2_ATOM); 
+          }
         }
       }
-      /* - sjkang*/
+      /* << MAE local spin rotation - sjkang */
     } 
 
     /* save current data */
@@ -975,16 +983,22 @@ void Output_Charge_Density(int MD_iter)
     else{
       printf("Could not open a file %s\n",fileCD0);
     }
-    for(i=1; i<=atomnum; i++){
-      sprintf(fileCD0_ATOM,"%s%s_rst/%s.crst%i_%i_%i_0",filepath,filename,filename,i,spin,myid);
-      if ((fp = fopen(fileCD0_ATOM,"wb")) != NULL){
-        fwrite(TmpRhoAtom[i],sizeof(double),My_NumGridB_AB,fp);
-        fclose(fp);
-      }
-      else{
-        printf("Could not open a file %s\n",fileCD0_ATOM);
+
+    /* >> MAE local spin rotation - sjkang */
+    if (Restart_Write_Atom_Charge ==1){
+      for(i=1; i<=atomnum; i++){
+        sprintf(fileCD0_ATOM,"%s%s_rst/%s.crst%i_%i_%i_0",filepath,filename,filename,i,spin,myid);
+        if ((fp = fopen(fileCD0_ATOM,"wb")) != NULL){
+          fwrite(TmpRhoAtom[i],sizeof(double),My_NumGridB_AB,fp);
+          fclose(fp);
+        }
+        else{
+          printf("Could not open a file %s\n",fileCD0_ATOM);
+        }
       }
     }
+    /* << MAE local spin rotation - sjkang */
+
   } /* spin */
 
   /****************************************************
@@ -1005,10 +1019,14 @@ void Output_Charge_Density(int MD_iter)
   /* freeing of array */
   free(TmpRho);
 
-  for(i=0; i<=atomnum; i++){
-    free(TmpRhoAtom[i]);
+  /* >> MAE local spin rotation - sjkang */
+  if (Restart_Write_Atom_Charge ==1){
+    for(i=0; i<=atomnum; i++){
+      free(TmpRhoAtom[i]);
+    }
+    free(TmpRhoAtom);
   }
-  free(TmpRhoAtom);
+  /* << MAE local spin rotation - sjkang */
 }
 
 
@@ -1022,7 +1040,7 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 {
   double phi[2],theta[2],si_sq,co_sq,sc, Qx; /*pohao*/
   double Re11,Re22,Re12,Im12;    /*pohao*/
-  int j,k, l, rest_col;    /*pohao*/
+  int j,k, l, m, rest_col;    /*pohao*/
   double complex z;    /*pohao*/
   double complex N_spin_rot[2][2];    /*pohao*/
   double complex U_nQx[2][2];    /*pohao*/
@@ -1036,10 +1054,10 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
   int numprocs,myid;
   FILE *fp;
   char fileCD[YOUSO10];
-  char fileCD0_ATOM[YOUSO10];
+  char fileCD0_ATOM[YOUSO10]; /* MAE local spin rotation - sjkang */
   char file_check[YOUSO10];
   double *tmp_array;
-  double **tmp_array_atom;
+  double **tmp_array_atom; /* MAE local spin rotation - sjkang */
   int i_vec[10];
 
   /* MPI */
@@ -1106,28 +1124,33 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 	else{
 	  /* printf("Could not open a file %s\n",fileCD); */
 	}
-      for(j=1; j<=atomnum; j++){
-        sprintf(fileCD0_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,restart_filename,restart_filename,j,spin,myid,i);
-        if ((fp = fopen(fileCD0_ATOM,"rb")) != NULL){
-          fread(tmp_array_atom[j],sizeof(double),My_NumGridB_AB,fp);
-          fclose(fp);
-      	  if (i==0){
-      	    if (spin<=1){
-      	      for (BN=0; BN<My_NumGridB_AB; BN++){
-      		    Density_Grid_B_Atom[j][spin][BN] = extpln_coes[i]*tmp_array_atom[j][BN];
-      	      }
-      	    }
-      	  }
-      	  else{
-      	    for (BN=0; BN<My_NumGridB_AB; BN++){
-      		    Density_Grid_B_Atom[j][spin][BN] += extpln_coes[i]*tmp_array_atom[j][BN];
-      	    }
-      	  }
-        }
-        else{
-          /* printf("Could not open a file %s\n",fileCD0_ATOM); */
+
+      /* >> MAE local spin rotation - sjkang */
+      if (Restart_Read_Atom_Charge ==1){
+        for(j=1; j<=atomnum; j++){
+          sprintf(fileCD0_ATOM,"%s%s_rst/%s.crst%i_%i_%i_%i",filepath,restart_filename,restart_filename,j,spin,myid,i);
+          if ((fp = fopen(fileCD0_ATOM,"rb")) != NULL){
+            fread(tmp_array_atom[j],sizeof(double),My_NumGridB_AB,fp);
+            fclose(fp);
+        	  if (i==0){
+        	    if (spin<=1){
+        	      for (BN=0; BN<My_NumGridB_AB; BN++){
+        		    Density_Grid_B_Atom[j][spin][BN] = extpln_coes[i]*tmp_array_atom[j][BN];
+        	      }
+        	    }
+        	  }
+        	  else{
+        	    for (BN=0; BN<My_NumGridB_AB; BN++){
+        		    Density_Grid_B_Atom[j][spin][BN] += extpln_coes[i]*tmp_array_atom[j][BN];
+        	    }
+        	  }
+          }
+          else{
+            /* printf("Could not open a file %s\n",fileCD0_ATOM); */
+          }
         }
       }
+      /* << MAE local spin rotation - sjkang */
       }
     }
 
@@ -1197,6 +1220,60 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 
       }
 
+      /* >> MAE local spin rotation - sjkang */
+      if (Restart_Read_Atom_Charge ==1){
+        for (BN=0; BN<My_NumGridB_AB; BN++){
+          Density_Grid_B[0][BN] = 0.0;  
+          Density_Grid_B[1][BN] = 0.0;
+          Density_Grid_B[2][BN] = 0.0;
+          Density_Grid_B[3][BN] = 0.0;
+
+          for(m=1; m<=atomnum; m++){
+            t = Restart_Spin_Angles[m][0]/180.0*PI*0.5; 
+            p = Restart_Spin_Angles[m][1]/180.0*PI*0.5; 
+
+            U_nQx[0][0]  = cos(p)*cos(t)+I*sin(p)*cos(t);
+            U_nQx[1][0]  =-cos(p)*sin(t)-I*sin(p)*sin(t);
+            U_nQx[0][1]  = cos(p)*sin(t)-I*sin(p)*sin(t);
+            U_nQx[1][1]  = cos(p)*cos(t)-I*sin(p)*cos(t);
+  
+            U_nQx_h[0][0]= cos(p)*cos(t)-I*sin(p)*cos(t);
+            U_nQx_h[1][0]= cos(p)*sin(t)+I*sin(p)*sin(t);
+            U_nQx_h[0][1]=-cos(p)*sin(t)+I*sin(p)*sin(t); 
+            U_nQx_h[1][1]= cos(p)*cos(t)+I*sin(p)*cos(t);
+
+            N_spin[0][0] = Density_Grid_B_Atom[m][0][BN]; 
+            N_spin[1][0] = 0.0; 
+            N_spin[0][1] = 0.0; 
+            N_spin[1][1] = Density_Grid_B_Atom[m][1][BN];
+
+	          for (k=0; k <2; k++) {
+	            for (j=0; j <2; j++) {
+	              N_spin_rot[k][j] = 0.0;
+	            }
+	          }
+
+            for (j=0; j<2; j++) {
+              for (k=0; k<2; k++) {
+                for (l=0; l<2; l++) {
+                  N_spin_rot[j][l] += U_nQx_h[j][k] * N_spin[k][k] * U_nQx[k][l];
+                }    
+              }
+            } 
+
+            Re11 = creal(N_spin_rot[0][0]); 
+            Re22 = creal(N_spin_rot[1][1]);
+            Re12 = creal(N_spin_rot[0][1]);
+            Im12 = cimag(N_spin_rot[0][1]);
+            
+            Density_Grid_B[0][BN] += Re11;  
+            Density_Grid_B[1][BN] += Re22;
+            Density_Grid_B[2][BN] += Re12;
+            Density_Grid_B[3][BN] += Im12;
+          }
+        }
+      }
+    /* >> MAE local spin rotation - sjkang */
     } /* if (Use_of_Collinear_Restart==1) */
 
     /* MPI: from the partitions B to D */

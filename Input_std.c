@@ -2554,18 +2554,21 @@ void Input_std(char *file)
   input_double("scf.Restart.Spin.Angle.Theta",&Restart_Spin_Angle_Theta,(double)0.0);
   input_double("scf.Restart.Spin.Angle.Phi",&Restart_Spin_Angle_Phi,(double)0.0);
 
+  /* >> MAE local spin rotation - sjkang */
+  input_logical("scf.Restart.Read.Atom.Charge",&Restart_Read_Atom_Charge, 0);
+  input_logical("scf.Restart.Write.Atom.Charge",&Restart_Write_Atom_Charge, 0);
+
   if (fp=input_find("<SCF.Restart.Spin.Angles")) {
     for (i=1; i<=atomnum; i++){  
-      fscanf(fp,"%lf %lf",
-             &Restart_Spin_Angles[i][0], &Restart_Spin_Angles[i][1]);
+      fscanf(fp,"%lf %lf", &Restart_Spin_Angles[i][0], &Restart_Spin_Angles[i][1]);
     }  
-
     if ( ! input_last("SCF.Restart.Spin.Angles>") ) {
       /* format error */
       printf("Format error for SCF.Restart.Spin.Angles\n");
       po++;
     }
   }
+  /* << MAE local spin rotation - sjkang */
 
   if (Use_of_Collinear_Restart==1 && Scf_RestartFromFile==1){
  
