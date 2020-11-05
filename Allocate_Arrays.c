@@ -155,13 +155,17 @@ void Allocate_Arrays(int wherefrom)
         atom_Fixed_XYZ[i][3] = 0;
       }
 
-      Restart_Spin_Angles = (double**)malloc(sizeof(double)*(atomnum+1));
-      for(i=0; i<=atomnum; i++){
-        Restart_Spin_Angles[i] = (double*)malloc(sizeof(double)*2);
-        /* default='theta=0, phi=0' */
-        Restart_Spin_Angles[i][0] = 0.0;
-        Restart_Spin_Angles[i][1] = 0.0;
+      /* >> MAE local spin rotation - sjkang */
+      if (Restart_Read_Atom_Charge == 1){
+        Restart_Spin_Angles = (double**)malloc(sizeof(double)*(atomnum+1));
+        for(i=0; i<=atomnum; i++){
+          Restart_Spin_Angles[i] = (double*)malloc(sizeof(double)*2);
+          /* default='theta=0, phi=0' */
+          Restart_Spin_Angles[i][0] = 0.0;
+          Restart_Spin_Angles[i][1] = 0.0;
+        }
       }
+      /* << MAE local spin rotation - sjkang */
 
       Cell_Gxyz = (double**)malloc(sizeof(double*)*(atomnum+4));
       for (i=0; i<(atomnum+4); i++){

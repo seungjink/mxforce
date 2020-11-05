@@ -867,7 +867,8 @@ void Output_HKS(int MD_iter, double *Uele, double *****CH )
 
 void Output_Charge_Density(int MD_iter)
 {
-  int i,j,spin,BN;
+  int i,spin,BN;
+  int j; /* MAE local spin rotation - sjkang */
   int numprocs,myid;
   double *TmpRho;
   double **TmpRhoAtom; /* MAE local spin rotation - sjkang */
@@ -949,6 +950,7 @@ void Output_Charge_Density(int MD_iter)
     /* shift the index of stored data */
 
     for (i=(Extrapolated_Charge_History-2); 0<=i; i--){
+
       sprintf(fileCD1,"%s%s_rst/%s.crst%i_%i_%i",filepath,filename,filename,spin,myid,i);
       sprintf(fileCD2,"%s%s_rst/%s.crst%i_%i_%i",filepath,filename,filename,spin,myid,i+1);
 
@@ -1040,7 +1042,8 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 {
   double phi[2],theta[2],si_sq,co_sq,sc, Qx; /*pohao*/
   double Re11,Re22,Re12,Im12;    /*pohao*/
-  int j,k, l, m, rest_col;    /*pohao*/
+  int j,k, l, rest_col;    /*pohao*/
+  int m; /* MAE local spin rotation - sjkang */
   double complex z;    /*pohao*/
   double complex N_spin_rot[2][2];    /*pohao*/
   double complex U_nQx[2][2];    /*pohao*/
@@ -1082,9 +1085,12 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 
     tmp_array = (double*)malloc(sizeof(double)*My_NumGridB_AB);
 
-    tmp_array_atom = (double**)malloc(sizeof(double)*(atomnum+1)); 
-    for(i=0; i<=atomnum; i++){
-      tmp_array_atom[i] = (double*)malloc(sizeof(double)*My_NumGridB_AB);
+    /* MAE local spin rotation - sjkang */
+    if (Restart_Read_Atom_Charge ==1){
+      tmp_array_atom = (double**)malloc(sizeof(double)*(atomnum+1)); 
+      for(i=0; i<=atomnum; i++){
+        tmp_array_atom[i] = (double*)malloc(sizeof(double)*My_NumGridB_AB);
+      }
     }
 
     /* read data and extrapolate data of crst files */

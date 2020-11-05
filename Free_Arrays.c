@@ -2689,10 +2689,14 @@ void array0()
   }
   free(atom_Fixed_XYZ);
 
-  for(i=0; i<=atomnum; i++){
-    free(Restart_Spin_Angles[i]);
+  /* >> MAE local spin rotation - sjkang */
+  if (Restart_Read_Atom_Charge ==1 ){
+    for(i=0; i<=atomnum; i++){
+      free(Restart_Spin_Angles[i]);
+    }
+    free(Restart_Spin_Angles);
   }
-  free(Restart_Spin_Angles);
+  /* << MAE local spin rotation - sjkang */
 
   for (i=0; i<(atomnum+4); i++){
     free(Cell_Gxyz[i]);
