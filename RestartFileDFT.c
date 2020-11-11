@@ -940,7 +940,14 @@ void Output_Charge_Density(int MD_iter)
       if (spin<=1){
         for (i=1; i<=atomnum; i++){
           for (BN=0; BN<My_NumGridB_AB; BN++){
-            TmpRhoAtom[i][BN] = Density_Grid_B_Atom[i][spin][BN]; // - ADensity_Grid_B[BN];
+            TmpRhoAtom[i][BN] = Density_Grid_B_Atom[i][spin][BN] - ADensity_Grid_B[BN];
+          }
+        }
+      }
+      else{
+        for (i=1; i<=atomnum; i++){
+          for (BN=0; BN<My_NumGridB_AB; BN++){
+            TmpRhoAtom[i][BN] = Density_Grid_B_Atom[i][spin][BN];
           }
         }
       }
@@ -1141,6 +1148,11 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
         	  if (i==0){
         	    if (spin<=1){
         	      for (BN=0; BN<My_NumGridB_AB; BN++){
+          		    Density_Grid_B_Atom[j][spin][BN] = ADensity_Grid_B[BN] + extpln_coes[i]*tmp_array_atom[j][BN];
+        	      }
+        	    }
+              else{
+        	      for (BN=0; BN<My_NumGridB_AB; BN++){
         		    Density_Grid_B_Atom[j][spin][BN] = extpln_coes[i]*tmp_array_atom[j][BN];
         	      }
         	    }
@@ -1167,7 +1179,6 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
       if (myid==0) printf("The collinear charge density is read for the non-collinear calculation.\n"); fflush(stdout);     
 
       /* copy rho11 to rho22 */
-
       if (SpinP_switch_RestartFiles==0){
         for (BN=0; BN<My_NumGridB_AB; BN++){
 	  Density_Grid_B[1][BN] = Density_Grid_B[0][BN];
@@ -1227,7 +1238,7 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
       }
 
       /* >> MAE local spin rotation - sjkang */
-      if (Restart_Read_Atom_Charge ==1){
+      if (Restart_Read_Atom_Charge == 1){
         for (BN=0; BN<My_NumGridB_AB; BN++){
           Density_Grid_B[0][BN] = 0.0;  
           Density_Grid_B[1][BN] = 0.0;

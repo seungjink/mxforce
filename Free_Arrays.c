@@ -150,15 +150,13 @@ void array0()
     
     /* >> MAE local spin rotation - sjkang */
     if (Restart_Read_Atom_Charge ==1 || Restart_Write_Atom_Charge == 1){
-      if (SpinP_switch != 3){
-        for (i=0; i<=atomnum; i++){
-          for (j=0; j<=1; j++){
-            free(Density_Grid_B_Atom[i][j]);
-          }
-          free(Density_Grid_B_Atom[i]);
+      for (i=0; i<=atomnum; i++){
+        for (j=0; j<=1; j++){
+          free(Density_Grid_B_Atom[i][j]);
         }
-        free(Density_Grid_B_Atom);
+        free(Density_Grid_B_Atom[i]);
       }
+      free(Density_Grid_B_Atom);
     }
     /* << MAE local spin rotation - sjkang */
 

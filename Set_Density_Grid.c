@@ -710,9 +710,9 @@ double Set_Density_Grid(int Cnt_kind, int Calc_CntOrbital_ON, double *****CDM, d
   /* >> MAE local spin rotation - sjkang */
   if (Restart_Read_Atom_Charge ==1 || Restart_Write_Atom_Charge == 1){
     for (i=0; i<=atomnum; i++){
-      for (spin=0; spin<(SpinP_switch+1); spin++){
+      for (spin=0; spin<2; spin++){
         for (BN=0; BN<My_NumGridB_AB; BN++){
-          Density_Grid_B0[spin][BN] = 0.0;
+          Density_Grid_B_Atom[i][spin][BN] = 0.0;
         }
       }
     }
@@ -774,7 +774,6 @@ double Set_Density_Grid(int Cnt_kind, int Calc_CntOrbital_ON, double *****CDM, d
       Density_Grid_B0[3][BN] = -Density_Grid_B0[3][BN]; 
     }
   }
-
   /******************************************************
              MPI: from the partitions B to D
   ******************************************************/
