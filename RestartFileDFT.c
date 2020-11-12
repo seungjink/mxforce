@@ -1316,6 +1316,15 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
     /* free */
     free(tmp_array);
 
+    /* >> MAE local spin rotation - sjkang */
+    if (Restart_Read_Atom_Charge ==1){
+      for(i=0; i<=atomnum; i++){
+        free(tmp_array_atom[i]);
+      }
+      free(tmp_array_atom);
+    }
+    /* << MAE local spin rotation - sjkang */
+
     /* ret1 */
     ret = 1;
   }
