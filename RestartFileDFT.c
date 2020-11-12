@@ -954,6 +954,16 @@ void Output_Charge_Density(int MD_iter)
     }
     /* << MAE local spin rotation - sjkang */
 
+
+    //check output mulliken
+      for (spin=0; spin<=1; spin++){
+        for (BN=0; BN<My_NumGridB_AB; BN++){
+          printf("Total  Density : %.12f \n",  Density_Grid_B[spin][BN]);
+          printf("Atom 1 Density : %.12f \n",  Density_Grid_B_Atom[1][spin][BN]);
+          printf("Atom 2 Density : %.12f \n\n",Density_Grid_B_Atom[2][spin][BN]);
+        }
+      }
+
     /* shift the index of stored data */
 
     for (i=(Extrapolated_Charge_History-2); 0<=i; i--){
