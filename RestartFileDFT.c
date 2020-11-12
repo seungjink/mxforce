@@ -954,16 +954,6 @@ void Output_Charge_Density(int MD_iter)
     }
     /* << MAE local spin rotation - sjkang */
 
-
-    //check output mulliken
-      for (spin=0; spin<=1; spin++){
-        for (BN=0; BN<My_NumGridB_AB; BN++){
-          printf("Total  Density : %.12f \n",  Density_Grid_B[spin][BN]);
-          printf("Atom 1 Density : %.12f \n",  Density_Grid_B_Atom[1][spin][BN]);
-          printf("Atom 2 Density : %.12f \n\n",Density_Grid_B_Atom[2][spin][BN]);
-        }
-      }
-
     /* shift the index of stored data */
 
     for (i=(Extrapolated_Charge_History-2); 0<=i; i--){
@@ -1061,6 +1051,8 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
   double Re11,Re22,Re12,Im12;    /*pohao*/
   int j,k, l, rest_col;    /*pohao*/
   int m; /* MAE local spin rotation - sjkang */
+  double *ratio; /* MAE local spin rotation - sjkang */
+  double ratiosum;  /* MAE local spin rotation - sjkang */
   double complex z;    /*pohao*/
   double complex N_spin_rot[2][2];    /*pohao*/
   double complex U_nQx[2][2];    /*pohao*/
@@ -1102,13 +1094,15 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 
     tmp_array = (double*)malloc(sizeof(double)*My_NumGridB_AB);
 
-    /* MAE local spin rotation - sjkang */
+    /* >> MAE local spin rotation - sjkang */
     if (Restart_Read_Atom_Charge ==1){
       tmp_array_atom = (double**)malloc(sizeof(double)*(atomnum+1)); 
       for(i=0; i<=atomnum; i++){
         tmp_array_atom[i] = (double*)malloc(sizeof(double)*My_NumGridB_AB);
       }
+      ratio = (double*)malloc(sizeof(double)*(atomnum+1));
     }
+    /* << MAE local spin rotation - sjkang */
 
     /* read data and extrapolate data of crst files */
 
@@ -1199,6 +1193,8 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
                                rotation of spin angle 
       ******************************************************************************/
       
+
+      if (Restart_Read_Atom_Charge == 0){
       t = Restart_Spin_Angle_Theta/180.0*PI*0.5; 
       p = Restart_Spin_Angle_Phi/180.0*PI*0.5; 
       
@@ -1246,60 +1242,69 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 	Density_Grid_B[3][BN] = Im12;
 
       }
+      }
 
       /* >> MAE local spin rotation - sjkang */
       if (Restart_Read_Atom_Charge == 1){
         for (BN=0; BN<My_NumGridB_AB; BN++){
-          Density_Grid_B[0][BN] = 0.0;  
-          Density_Grid_B[1][BN] = 0.0;
-          Density_Grid_B[2][BN] = 0.0;
-          Density_Grid_B[3][BN] = 0.0;
-
+          ratiosum = 0;
+          t = 0.0;
+          p = 0.0;
           for(m=1; m<=atomnum; m++){
-            t = Restart_Spin_Angles[m][0]/180.0*PI*0.5; 
-            p = Restart_Spin_Angles[m][1]/180.0*PI*0.5; 
+        		ratio[m] = Density_Grid_B_Atom[m][0][BN] + Density_Grid_B_Atom[m][1][BN];
+            ratiosum += ratio[m];
+          }
+          if (ratiosum == 0.0 ){
+            t = 0.0;
+            p = 0.0;
+          }
+          else{
+            for(m=1; m<=atomnum; m++){
+              t += ratio[m]/ratiosum * Restart_Spin_Angles[m][0]/180.0*PI*0.5; 
+              p += ratio[m]/ratiosum * Restart_Spin_Angles[m][1]/180.0*PI*0.5; 
+            }
+          }
 
-            U_nQx[0][0]  = cos(p)*cos(t)+I*sin(p)*cos(t);
-            U_nQx[1][0]  =-cos(p)*sin(t)-I*sin(p)*sin(t);
-            U_nQx[0][1]  = cos(p)*sin(t)-I*sin(p)*sin(t);
-            U_nQx[1][1]  = cos(p)*cos(t)-I*sin(p)*cos(t);
+          U_nQx[0][0]  = cos(p)*cos(t)+I*sin(p)*cos(t);
+          U_nQx[1][0]  =-cos(p)*sin(t)-I*sin(p)*sin(t);
+          U_nQx[0][1]  = cos(p)*sin(t)-I*sin(p)*sin(t);
+          U_nQx[1][1]  = cos(p)*cos(t)-I*sin(p)*cos(t);
   
-            U_nQx_h[0][0]= cos(p)*cos(t)-I*sin(p)*cos(t);
-            U_nQx_h[1][0]= cos(p)*sin(t)+I*sin(p)*sin(t);
-            U_nQx_h[0][1]=-cos(p)*sin(t)+I*sin(p)*sin(t); 
-            U_nQx_h[1][1]= cos(p)*cos(t)+I*sin(p)*cos(t);
+          U_nQx_h[0][0]= cos(p)*cos(t)-I*sin(p)*cos(t);
+          U_nQx_h[1][0]= cos(p)*sin(t)+I*sin(p)*sin(t);
+          U_nQx_h[0][1]=-cos(p)*sin(t)+I*sin(p)*sin(t); 
+          U_nQx_h[1][1]= cos(p)*cos(t)+I*sin(p)*cos(t);
 
-            N_spin[0][0] = Density_Grid_B_Atom[m][0][BN]; 
-            N_spin[1][0] = 0.0; 
-            N_spin[0][1] = 0.0; 
-            N_spin[1][1] = Density_Grid_B_Atom[m][1][BN];
+          N_spin[0][0] = Density_Grid_B_Atom[m][0][BN]; 
+          N_spin[1][0] = 0.0; 
+          N_spin[0][1] = 0.0; 
+          N_spin[1][1] = Density_Grid_B_Atom[m][1][BN];
 
-	          for (k=0; k <2; k++) {
-	            for (j=0; j <2; j++) {
-	              N_spin_rot[k][j] = 0.0;
-	            }
+	        for (k=0; k <2; k++) {
+	          for (j=0; j <2; j++) {
+	            N_spin_rot[k][j] = 0.0;
 	          }
+	        }
 
-            for (j=0; j<2; j++) {
-              for (k=0; k<2; k++) {
-                for (l=0; l<2; l++) {
-                  N_spin_rot[j][l] += U_nQx_h[j][k] * N_spin[k][k] * U_nQx[k][l];
-                }    
-              }
-            } 
+          for (j=0; j<2; j++) {
+            for (k=0; k<2; k++) {
+              for (l=0; l<2; l++) {
+                N_spin_rot[j][l] += U_nQx_h[j][k] * N_spin[k][k] * U_nQx[k][l];
+              }    
+            }
+          } 
 
-            Re11 = creal(N_spin_rot[0][0]); 
-            Re22 = creal(N_spin_rot[1][1]);
-            Re12 = creal(N_spin_rot[0][1]);
-            Im12 = cimag(N_spin_rot[0][1]);
-            
-            Density_Grid_B[0][BN] += Re11;  
-            Density_Grid_B[1][BN] += Re22;
-            Density_Grid_B[2][BN] += Re12;
-            Density_Grid_B[3][BN] += Im12;
+          Re11 = creal(N_spin_rot[0][0]); 
+          Re22 = creal(N_spin_rot[1][1]);
+          Re12 = creal(N_spin_rot[0][1]);
+          Im12 = cimag(N_spin_rot[0][1]);
+          
+          Density_Grid_B[0][BN] += Re11;  
+          Density_Grid_B[1][BN] += Re22;
+          Density_Grid_B[2][BN] += Re12;
+          Density_Grid_B[3][BN] += Im12;
           }
         }
-      }
     /* >> MAE local spin rotation - sjkang */
     } /* if (Use_of_Collinear_Restart==1) */
 
@@ -1325,6 +1330,16 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
 
     /* free */
     free(tmp_array);
+
+    /* >> MAE local spin rotation - sjkang */
+    if (Restart_Read_Atom_Charge ==1){
+      for(i=0; i<=atomnum; i++){
+        free(tmp_array_atom[i]);
+      }
+      free(tmp_array_atom);
+      free(ratio);
+    }
+    /* << MAE local spin rotation - sjkang */
 
     /* ret1 */
     ret = 1;
