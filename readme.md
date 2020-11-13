@@ -1,6 +1,6 @@
-# Foobar
+# mx mft
 
-Foobar is a Python library for dealing with word pluralization.
+Test calculation for mft with local spin perturbaiton.
 
 ## Installation
 
