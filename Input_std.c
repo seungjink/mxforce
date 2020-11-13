@@ -2558,6 +2558,13 @@ void Input_std(char *file)
   input_logical("scf.Restart.Read.Atom.Charge",&Restart_Read_Atom_Charge, 0);
   input_logical("scf.Restart.Write.Atom.Charge",&Restart_Write_Atom_Charge, 0);
 
+  s_vec[0]="full";      i_vec[0] = 0;   /* default, use MAE */ 
+  s_vec[1]="atom";      i_vec[1] = 1;   /* atomic rotation */ 
+  s_vec[2]="average";   i_vec[2] = 2;   /* average spin in overlap region */ 
+  s_vec[3]="oneside";   i_vec[3] = 3;   /* Follow large one */ 
+
+  input_string2int("scf.Restart.Spin.Mixing", &Restart_Spin_Mixing_Switch, 4, s_vec,i_vec);
+
   if (fp=input_find("<SCF.Restart.Spin.Angles")) {
     for (i=1; i<=atomnum; i++){  
       fscanf(fp,"%lf %lf", &Restart_Spin_Angles[i][0], &Restart_Spin_Angles[i][1]);
