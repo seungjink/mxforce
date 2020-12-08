@@ -249,6 +249,7 @@ double Band_DFT_NonCol(
   if (lumos<60.0) lumos = 400.0;
   MaxN = (TZ-system_charge)/2 + (int)lumos;
   if (n2<MaxN) MaxN = n2;
+  MaxN = n2;
 
   /***********************************************
      allocation of arrays

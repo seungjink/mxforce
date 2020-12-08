@@ -2562,8 +2562,9 @@ void Input_std(char *file)
   s_vec[1]="atom";      i_vec[1] = 1;   /* atomic rotation */ 
   s_vec[2]="average";   i_vec[2] = 2;   /* average spin in overlap region */ 
   s_vec[3]="oneside";   i_vec[3] = 3;   /* Follow large one */ 
+  s_vec[4]="diag";      i_vec[4] = 4;   /* diagonalize and folow that direction */ 
 
-  input_string2int("scf.Restart.Spin.Mixing", &Restart_Spin_Mixing_Switch, 4, s_vec,i_vec);
+  input_string2int("scf.Restart.Spin.Mixing", &Restart_Spin_Mixing_Switch, 5, s_vec,i_vec);
 
   if (fp=input_find("<SCF.Restart.Spin.Angles")) {
     for (i=1; i<=atomnum; i++){  

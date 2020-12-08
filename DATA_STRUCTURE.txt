@@ -26,3 +26,6 @@ Density_Grid_B_Atom[i][j][k]
     i = atomnum, 1~atomnum
     j = spin idx, 0,1
     k = grid
+
+int Cnt_Switch
+	orbital.Opt.Method 

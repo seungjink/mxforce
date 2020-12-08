@@ -904,6 +904,61 @@ double DFT(int MD_iter, int Cnt_Now)
     *****************************************************/
 
     time14 += Mulliken_Charge("stdout");
+/*
+    printf("[BP 00: Check TOTEN\n");
+  if (!orbitalOpt_Force_Skip) time8 += Total_Energy(MD_iter,DM[0],ECE);
+
+  Uatom  = 0.0;
+  Ucore  = ECE[0];
+  UH0    = ECE[1];
+  Ukin   = ECE[2];
+  Una    = ECE[3];
+  Unl    = ECE[4];
+  UH1    = ECE[5];
+  Uxc0   = ECE[6];
+  Uxc1   = ECE[7];
+  Uhub   = ECE[8];    
+  Ucs    = ECE[9]; 
+  Uzs    = ECE[10];
+  Uzo    = ECE[11];
+  Uef    = ECE[12];
+  UvdW   = ECE[13];
+  Uch    = ECE[14];
+
+  Utot  = Ucore + UH0 + Ukin + Una + Unl + UH1
+         + Uxc0 + Uxc1 + Uhub + Ucs + Uzs + Uzo + Uef + UvdW + Uch; 
+
+
+  dtime(&TEtime);
+  time0 = TEtime - TStime;
+
+  if (MYID_MPI_COMM_WORLD==Host_ID && 0<level_stdout){
+
+    printf("\n*********** TEMP TOTAL ENERRGY         ****************\n"); 
+    printf("                Total Energy (Hartree) at MD =%2d        \n",MD_iter);
+    printf("*******************************************************\n\n"); 
+
+    printf("  Uele  = %20.12f\n\n",Uele);
+    printf("  Ukin  = %20.12f\n",Ukin);
+    printf("  UH0   = %20.12f\n",UH0);
+    printf("  UH1   = %20.12f\n",UH1);
+    printf("  Una   = %20.12f\n",Una);
+    printf("  Unl   = %20.12f\n",Unl);
+    printf("  Uxc0  = %20.12f\n",Uxc0);
+    printf("  Uxc1  = %20.12f\n",Uxc1);
+    printf("  Ucore = %20.12f\n",Ucore);
+    printf("  Uhub  = %20.12f\n",Uhub);
+    printf("  Ucs   = %20.12f\n",Ucs);
+    printf("  Uzs   = %20.12f\n",Uzs);
+    printf("  Uzo   = %20.12f\n",Uzo);
+    printf("  Uef   = %20.12f\n",Uef);
+    printf("  UvdW  = %20.12f\n",UvdW);
+    printf("  Uch   = %20.12f\n",Uch);
+    printf("  Utot  = %20.12f\n\n",Utot);
+    printf("  UpV   = %20.12f\n",UpV);
+    printf("  Enpy  = %20.12f\n",Utot+UpV);
+  }
+*/
 
     /*****************************************************
                     check SCF-convergence 

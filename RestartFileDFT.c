@@ -1051,6 +1051,7 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
   double Re11,Re22,Re12,Im12;    /*pohao*/
   int j,k, l, rest_col;    /*pohao*/
   int m; /* MAE local spin rotation - sjkang */
+  double pNu[2], pNd[2], pt[2], pp[2]; /* MAE local spin rotation - sjkang */
   double complex z;    /*pohao*/
   double complex N_spin_rot[2][2];    /*pohao*/
   double complex U_nQx[2][2];    /*pohao*/
@@ -1377,6 +1378,99 @@ int Input_Charge_Density(int MD_iter, double *extpln_coes)
             Density_Grid_B[2][BN] += Re12;
             Density_Grid_B[3][BN] += Im12;
           }
+
+          EulerAngle_Spin( 1, Re11, Re22, Re12, Im12, Re12, -Im12, pNu, pNd, pt, pp );
+//          if ((pNu[0] != 0.0) && (pNd[0] !=0.0)){
+//            printf("[BP 0]: %.8f,  %.8f,  %.2f, %.2f\n", pNu[0], pNd[0], pt[0] * 180.0 / PI, pp[0] * 180.0 / PI );
+//          }
+        }
+      }
+      else if (Restart_Spin_Mixing_Switch == 4){
+        if (myid==0) printf("Restart Spin Mixing : diag \n"); fflush(stdout);     
+        for (BN=0; BN<My_NumGridB_AB; BN++){
+          Re11 = 0.0;
+          Re22 = 0.0;
+          Re12 = 0.0;
+          Im12 = 0.0;
+          for(m=1; m<=atomnum; m++){
+            t = Restart_Spin_Angles[m][0]/180.0*PI*0.5; 
+            p = Restart_Spin_Angles[m][1]/180.0*PI*0.5; 
+            U_nQx[0][0]  = cos(p)*cos(t)+I*sin(p)*cos(t);
+            U_nQx[1][0]  =-cos(p)*sin(t)-I*sin(p)*sin(t);
+            U_nQx[0][1]  = cos(p)*sin(t)-I*sin(p)*sin(t);
+            U_nQx[1][1]  = cos(p)*cos(t)-I*sin(p)*cos(t);
+
+            U_nQx_h[0][0]= cos(p)*cos(t)-I*sin(p)*cos(t);
+            U_nQx_h[1][0]= cos(p)*sin(t)+I*sin(p)*sin(t);
+            U_nQx_h[0][1]=-cos(p)*sin(t)+I*sin(p)*sin(t); 
+            U_nQx_h[1][1]= cos(p)*cos(t)+I*sin(p)*cos(t);
+            N_spin[0][0] = Density_Grid_B_Atom[m][0][BN]; 
+            N_spin[1][0] = 0.0; 
+            N_spin[0][1] = 0.0; 
+            N_spin[1][1] = Density_Grid_B_Atom[m][1][BN];
+           for (k=0; k <2; k++) {
+             for (j=0; j <2; j++) {
+               N_spin_rot[k][j] = 0.0;
+             }
+           }
+            for (j=0; j<2; j++) {
+              for (k=0; k<2; k++) {
+                for (l=0; l<2; l++) {
+                  N_spin_rot[j][l] += U_nQx_h[j][k] * N_spin[k][k] * U_nQx[k][l];
+                }    
+              }
+            } 
+            Re11 += creal(N_spin_rot[0][0]); 
+            Re22 += creal(N_spin_rot[1][1]);
+            Re12 += creal(N_spin_rot[0][1]);
+            Im12 += cimag(N_spin_rot[0][1]);
+          }
+
+          EulerAngle_Spin( 1, Re11, Re22, Re12, Im12, Re12, -Im12, pNu, pNd, pt, pp );
+//          if ((pNu[0] != 0.0) && (pNd[0] !=0.0)){
+//            printf("[BP 0]: %.8f,  %.8f,  %.2f, %.2f\n", pNu[0], pNd[0], pt[0] * 180.0 / PI, pp[0] * 180.0 / PI );
+//          }
+          t = pt[0] * 0.5; // /180.0*PI*0.5; 
+          p = pp[0] * 0.5; // /180.0*PI*0.5; 
+      
+          U_nQx[0][0]  = cos(p)*cos(t)+I*sin(p)*cos(t);
+          U_nQx[1][0]  =-cos(p)*sin(t)-I*sin(p)*sin(t);
+          U_nQx[0][1]  = cos(p)*sin(t)-I*sin(p)*sin(t);
+          U_nQx[1][1]  = cos(p)*cos(t)-I*sin(p)*cos(t);
+
+          U_nQx_h[0][0]= cos(p)*cos(t)-I*sin(p)*cos(t);
+          U_nQx_h[1][0]= cos(p)*sin(t)+I*sin(p)*sin(t);
+          U_nQx_h[0][1]=-cos(p)*sin(t)+I*sin(p)*sin(t); 
+          U_nQx_h[1][1]= cos(p)*cos(t)+I*sin(p)*cos(t);
+
+	        N_spin[0][0] = Density_Grid_B[0][BN]; 
+	        N_spin[1][0] = 0.0; 
+	        N_spin[0][1] = 0.0; 
+	        N_spin[1][1] = Density_Grid_B[1][BN];
+
+        	for (k=0; k <2; k++) {
+        	  for (j=0; j <2; j++) {
+        	    N_spin_rot[k][j] = 0.0;
+        	  }
+        	}
+
+	        for (j=0; j<2; j++) {
+	          for (k=0; k<2; k++) {
+	            for (l=0; l<2; l++) {
+	              N_spin_rot[j][l] += U_nQx_h[j][k] * N_spin[k][k] * U_nQx[k][l];
+	            }    
+	          }
+	        } 
+
+          Re11 = creal(N_spin_rot[0][0]); 
+          Re22 = creal(N_spin_rot[1][1]);
+          Re12 = creal(N_spin_rot[0][1]);
+          Im12 = cimag(N_spin_rot[0][1]);
+        
+          Density_Grid_B[0][BN] = Re11;  
+          Density_Grid_B[1][BN] = Re22;
+          Density_Grid_B[2][BN] = Re12;
+          Density_Grid_B[3][BN] = Im12;
         }
       }
     /* >> MAE local spin rotation - sjkang */
