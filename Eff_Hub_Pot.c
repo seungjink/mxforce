@@ -693,6 +693,12 @@ void H_U_dual(int SCF_iter, double ****OLP0)
 	    H_Hub[0][Mc_AN][j][m][n] = 0.5*Resum00;
 	    H_Hub[1][Mc_AN][j][m][n] = 0.5*Resum11;
 	    H_Hub[2][Mc_AN][j][m][n] = 0.5*Resum01;
+//        if (MYID_MPI_COMM_WORLD==Host_ID && 0<level_stdout){
+//          printf("[BP 0] : SCF: %i\n", SCF_iter);
+//          printf("[BP 0] : Hub[0] : %.12f\n", Resum00);
+//          printf("[BP 0] : Hub[1] : %.12f\n", Resum11);
+//          printf("[BP 0] : Hub[2] : %.12f\n", Resum01);
+//        }
 
             /* imaginary part */
 

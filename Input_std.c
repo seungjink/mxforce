@@ -1401,7 +1401,7 @@ void Input_std(char *file)
                (1) spin non-collinear
 	  *******************************************************/
 
-	  sscanf(buf,"%i %s %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %s",
+	    sscanf(buf,"%i %s %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %s",
 		 &j, Species,
 		 &Gxyz[i][1],&Gxyz[i][2],&Gxyz[i][3],
 		 &InitN_USpin[i],&InitN_DSpin[i],
@@ -1480,7 +1480,7 @@ void Input_std(char *file)
 
         WhatSpecies[i] = Species2int(Species);
 
-        if (Hub_U_switch==1) OrbPol_flag[i] = OrbPol2int(OrbPol);
+//        if (Hub_U_switch==1) OrbPol_flag[i] = OrbPol2int(OrbPol);
  
         if (i!=j){
           printf("Format error of the sequential number %i in <Atoms.SpeciesAndCoordinates\n",j);

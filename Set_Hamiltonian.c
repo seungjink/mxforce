@@ -106,6 +106,13 @@ double Set_Hamiltonian(char *mode,
 	      H[2][Mc_AN][h_AN][i][j] += H_Hub[2][Mc_AN][h_AN][i][j];
 	    }
 
+
+	    if( (Hub_U_switch==1 || 1<=Constraint_NCS_switch) && F_U_flag==1 && Restart_Read_Atom_Charge == 1 && SCF_iter==1 ){
+	      H[0][Mc_AN][h_AN][i][j] += H_Hub[0][Mc_AN][h_AN][i][j];
+	      H[1][Mc_AN][h_AN][i][j] += H_Hub[1][Mc_AN][h_AN][i][j];
+	      H[2][Mc_AN][h_AN][i][j] += H_Hub[2][Mc_AN][h_AN][i][j];
+	    }
+
 	    /* core hole Hamiltonain */
 
 	    if (core_hole_state_flag==1){

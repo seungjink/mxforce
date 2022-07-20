@@ -4548,6 +4548,17 @@ void make_NC_v_eff(int SCF_iter, int SucceedReadingDMfile, double dUele, double 
 	      NC_v_eff[0][1][Mc_AN][i][j].i = tmp_array2[num];  num++;
 	      NC_v_eff[1][0][Mc_AN][i][j].r = tmp_array2[num];  num++;
 	      NC_v_eff[1][0][Mc_AN][i][j].i = tmp_array2[num];  num++;
+//        if (MYID_MPI_COMM_WORLD==Host_ID && 0<level_stdout){
+//          printf("[BP 0] : SCF: %i\n", SCF_iter);
+//          printf("[BP 0] : NC[0] : %.12f\n", tmp_array2[0]);
+//          printf("[BP 0] : NC[1] : %.12f\n", tmp_array2[1]);
+//          printf("[BP 0] : NC[2] : %.12f\n", tmp_array2[2]);
+//          printf("[BP 0] : NC[3] : %.12f\n", tmp_array2[3]);
+//          printf("[BP 0] : NC[4] : %.12f\n", tmp_array2[4]);
+//          printf("[BP 0] : NC[5] : %.12f\n", tmp_array2[5]);
+//          printf("[BP 0] : NC[6] : %.12f\n", tmp_array2[6]);
+//          printf("[BP 0] : NC[7] : %.12f\n", tmp_array2[7]);
+//        }
 	    }
 	  }
 	}        

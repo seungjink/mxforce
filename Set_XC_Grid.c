@@ -315,9 +315,6 @@ void Set_XC_Grid(int SCF_iter, int XC_P_switch, int XC_switch,
 
 	ED[0] = Den0[MN];
 	ED[1] = Den1[MN];
-//	if((myid == 0)  && (Den0[MN] != 0.0)){
-//      printf("[BP 1]: %.8f,  %.8f,  %.2f, %.2f\n", Den0[MN], Den1[MN], Den2[MN] * 180.0 / PI, Den3[MN] * 180.0 / PI);
-//	}
 
 	/* partial core correction */
 	if (PCC_switch==1) {
@@ -343,9 +340,6 @@ void Set_XC_Grid(int SCF_iter, int XC_P_switch, int XC_switch,
 	ED[0] = Den0[MN];
 	ED[1] = Den1[MN];
 
-//	if((myid == 0)  && (Den0[MN] != 0.0)){
-//      printf("[BP 1]: %.8f,  %.8f,  %.2f, %.2f\n", Den0[MN], Den1[MN], Den2[MN] * 180.0 / PI, Den3[MN] * 180.0 / PI);
-//	}
 
 	/* partial core correction */
 	if (PCC_switch==1) {

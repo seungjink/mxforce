@@ -245,11 +245,16 @@ double Band_DFT_NonCol(
      find the number of states to be solved 
   ***********************************************/
 
-  lumos = (double)n2*0.200;
+  //lumos = (double)n2*0.200;
+  //if (lumos<60.0) lumos = 400.0;
+  //MaxN = (TZ-system_charge)/2 + (int)lumos;
+  //if (n2<MaxN) MaxN = n2;
+  //MaxN = n2;
+
+  lumos = (double)2*n*0.100;
   if (lumos<60.0) lumos = 400.0;
-  MaxN = (TZ-system_charge)/2 + (int)lumos;
-  if (n2<MaxN) MaxN = n2;
-  MaxN = n2;
+  MaxN = (TZ-system_charge) + (int)lumos;
+  if ( (2*n)<MaxN ) MaxN = 2*n;
 
   /***********************************************
      allocation of arrays

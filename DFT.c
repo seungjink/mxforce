@@ -473,6 +473,21 @@ double DFT(int MD_iter, int Cnt_Now)
               (SO_switch==0 && Hub_U_switch==0 && Constraint_NCS_switch==0 
                && Zeeman_NCS_switch==0 && Zeeman_NCO_switch==0) /* non-spin-orbit coupling and non-LDA+U */
 	    ){
+        if(Restart_Read_Atom_Charge == 1){
+          if (MYID_MPI_COMM_WORLD==Host_ID && 0<level_stdout){
+            printf("[BP 0] : JX calculation\n ");
+            printf("[BP 0] : Update Hubbard Hamiltonian during SCF==1\n");
+          }
+          if (  Hub_U_switch==1
+	        || 1<=Constraint_NCS_switch
+	        || Zeeman_NCS_switch==1 
+	        || Zeeman_NCO_switch==1){ 
+
+            Occupation_Number_LDA_U(10, SucceedReadingDMfile, dUele, ECE, "stdout"); 
+          }
+
+//          Eff_Hub_Pot(SCF_iter, OLP[0]) ; 
+        }
 
   	  time3 += Set_Hamiltonian("nostdout",
                                     MD_iter,
